@@ -174,161 +174,219 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <script>
         const mainurl = 'http://localhost:3000/api/';
-let currentPage = 1;
-
-const quill = new Quill('#editor', {
-    theme: "snow",
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, false] }],
-            ["bold", "italic", "underline"],
-            ["link", "image"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            ["image"],
-          ],
-        },
-});
-
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-}
-
-async function fetchAndDisplayBlogs(page = 1) {
-    try {
-        const response = await fetch(`${mainurl}latest-blogs?page=${page}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const blogs = await response.json();
-        const blogCardsContainer = document.getElementById('blog-cards');
-        console.log(blogs);
-        if (page === 1) {
-            blogCardsContainer.innerHTML = ''; 
-        }
-
-        blogs.forEach(blog => {
-            const blogCard = document.createElement('div');
-            blogCard.className = 'blog-card';
-            blogCard.innerHTML = `
-                <img src="${blog.image}" alt="${blog.title}">
-                <h3>${blog.title}</h3>
-                <p>Category: ${blog.category}</p>
-                <p>Date: ${formatDate(blog.createdat)}</p>
-                <p>Visibility: ${blog.visibility == 'true' ? 'Visible' : 'Hidden'}</p>
-                <button onclick="editPost(${blog.blogid})">Edit</button>
-                 <button onclick="deletePost(${blog.blogid})">Delete</button>
-            `;
-            blogCardsContainer.appendChild(blogCard);
-        });
-
-        // If less than 6 blogs were returned, hide the "See More" button
-        const seeMoreButton = document.getElementById('see-more-button');
-        seeMoreButton.style.display = blogs.length < 6 ? 'none' : 'block';
-    } catch (error) {
-        console.error('Error fetching blogs:', error);
-        alert('Failed to load blogs. Please try again later.');
-    }
-}
-
-async function editPost(blogid) {
-    try {
-        const response = await fetch(`${mainurl}magazinepage/${blogid}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const post = await response.json();
-
-        document.getElementById('post-id').value = post.blogid;
-        document.getElementById('title').value = post.title;
-        document.getElementById('category').value = post.category;
-        document.getElementById('image').value = post.image;
-        
-        quill.root.innerHTML = post.content; 
-        console.log(quill.root.innerHTML);
-
-        document.getElementById('visibility').checked = post.visibility == 'true';
-
-        document.getElementById('edit-form').style.display = 'block';
-    } catch (error) {
-        console.error('Error fetching post for edit:', error);
-        alert('Failed to load post for editing. Please try again.');
-    }
-}
-
-
-async function deletePost(blogid) {
-    try {
-        // Add a confirmation dialog
-        const confirm = window.confirm("Are you sure you want to delete this blog post?");
-        if (!confirm) {
-            return; // User canceled the deletion
-        }
-
-        const response = await fetch(`${mainurl}magazinepage/${blogid}`, {
-            method: 'DELETE',
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        alert(result.message || 'Blog deleted successfully');
-
-        // Refresh the blog list
-        document.getElementById('blog-cards').innerHTML = '';
-        currentPage = 1;
-        fetchAndDisplayBlogs(currentPage);
-    } catch (error) {
-        console.error('Error deleting blog:', error);
-        alert('Failed to delete blog. Please try again.');
-    }
-}
-
-document.getElementById('post-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const blogid = document.getElementById('post-id').value;
-    const formData = new FormData(e.target);
-    const postData = Object.fromEntries(formData.entries());
-
-    postData.content = quill.root.innerHTML;
-    postData.visibility = document.getElementById('visibility').checked ? 'true' : 'false';
-
-    try {
-        const response = await fetch(`${mainurl}magazinepage/${blogid}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(postData)
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        alert(result.message || 'Post updated successfully');
-        document.getElementById('edit-form').style.display = 'none';
-        // Refresh the blog list
-        document.getElementById('blog-cards').innerHTML = '';
-        currentPage = 1;
-        fetchAndDisplayBlogs(currentPage);
-    } catch (error) {
-        console.error('Error updating post:', error);
-        alert('Failed to update post. Please try again.');
-    }
-});
-
-document.getElementById('see-more-button').addEventListener('click', () => {
-    currentPage++;
-    fetchAndDisplayBlogs(currentPage);
-});
-
-// Initial load
-fetchAndDisplayBlogs(currentPage);
-    </script>
-
+        let currentPage = 1;
     
+        const quill = new Quill('#editor', {
+            theme: "snow",
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ["bold", "italic", "underline"],
+                    ["link", "image"],
+                    [{ list: "ordered" }, { list: "bullet" }],
+                    ["image"],
+                ],
+            },
+        });
+    
+        const newQuill = new Quill('#new-editor', {
+            theme: "snow",
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ["bold", "italic", "underline"],
+                    ["link", "image"],
+                    [{ list: "ordered" }, { list: "bullet" }],
+                    ["image"],
+                ],
+            },
+        });
+    
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+    
+        async function fetchAndDisplayBlogs(page = 1) {
+            try {
+                const response = await fetch(`${mainurl}latest-blogs?page=${page}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const blogs = await response.json();
+                const blogCardsContainer = document.getElementById('blog-cards');
+    
+                if (page === 1) {
+                    blogCardsContainer.innerHTML = '';
+                }
+    
+                blogs.forEach(blog => {
+                    const blogCard = document.createElement('div');
+                    blogCard.className = 'blog-card';
+                    blogCard.innerHTML = `
+                        <img src="${blog.image}" alt="${blog.title}">
+                        <h3>${blog.title}</h3>
+                        <p>Category: ${blog.category}</p>
+                        <p>Date: ${formatDate(blog.createdat)}</p>
+                        <p>Visibility: ${blog.visibility == 'true' ? 'Visible' : 'Hidden'}</p>
+                        <button onclick="editPost(${blog.id})">Edit</button>
+                        <button onclick="deletePost(${blog.id})">Delete</button>
+                    `;
 
+                  
+                    blogCardsContainer.appendChild(blogCard);
+                });
+    
+                const seeMoreButton = document.getElementById('see-more-button');
+                seeMoreButton.style.display = blogs.length < 6 ? 'none' : 'block';
+            } catch (error) {
+                console.error('Error fetching blogs:', error);
+                alert('Failed to load blogs. Please try again later.');
+            }
+        }
+    
+        async function editPost(id) {
+           
+            try {
+                const response = await fetch(`${mainurl}magazinepage/${id}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const post = await response.json();
+    
+                document.getElementById('post-id').value = post.id;
+                document.getElementById('title').value = post.title;
+                document.getElementById('category').value = post.category;
+                document.getElementById('image').value = post.image;
+    
+                quill.root.innerHTML = post.content;
+                document.getElementById('visibility').checked = post.visibility == 'true';
+    
+                document.getElementById('edit-form').style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching post for edit:', error);
+                alert('Failed to load post for editing. Please try again.');
+            }
+        }
+    
+        async function deletePost(id) {
+            try {
+                const confirmDelete = window.confirm("Are you sure you want to delete this blog post?");
+                if (!confirmDelete) {
+                    return;
+                }
+    
+                const response = await fetch(`${mainurl}magazinepage/${id}`, {
+                    method: 'DELETE',
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const result = await response.json();
+                alert(result.message || 'Blog deleted successfully');
+    
+                document.getElementById('blog-cards').innerHTML = '';
+                currentPage = 1;
+                fetchAndDisplayBlogs(currentPage);
+            } catch (error) {
+                console.error('Error deleting blog:', error);
+                alert('Failed to delete blog. Please try again.');
+            }
+        }
+    
+        document.getElementById('post-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('post-id').value;
+            const formData = new FormData(e.target);
+            const postData = Object.fromEntries(formData.entries());
+    
+            postData.content = quill.root.innerHTML;
+            postData.visibility = document.getElementById('visibility').checked ? 'true' : 'false';
+            
+            try {
+                const response = await fetch(`${mainurl}magazinepage/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(postData)
+                });
+                    console.log(response);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const result = await response.json();
+                alert(result.message || 'Post updated successfully');
+                document.getElementById('edit-form').style.display = 'none';
+                document.getElementById('blog-cards').innerHTML = '';
+                currentPage = 1;
+                fetchAndDisplayBlogs(currentPage);
+            } catch (error) {
+                console.error('Error updating post:', error);
+                alert('Failed to update post. Please try again.');
+            }
+        });
+    
+        document.getElementById('see-more-button').addEventListener('click', () => {
+            currentPage++;
+            fetchAndDisplayBlogs(currentPage);
+        });
+    
+        const newPostButton = document.getElementById('new-post-button');
+        const newPostModal = document.getElementById('new-post-modal');
+        const closeButton = document.getElementsByClassName('close-button')[0];
+    
+        newPostButton.addEventListener('click', () => {
+            newPostModal.style.display = 'block';
+        });
+    
+        closeButton.addEventListener('click', () => {
+            newPostModal.style.display = 'none';
+        });
+    
+        window.addEventListener('click', (event) => {
+            if (event.target == newPostModal) {
+                newPostModal.style.display = 'none';
+            }
+        });
+    
+        document.getElementById('new-post-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const postData = Object.fromEntries(formData.entries());
+    
+            postData.content = newQuill.root.innerHTML;
+            postData.visibility = document.getElementById('new-visibility').checked ? 'true' : 'false';
+    
+            try {
+                const response = await fetch(`${mainurl}magazinepage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(postData)
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const result = await response.json();
+                alert(result.message || 'Blog post created successfully');
+                newPostModal.style.display = 'none';
+                document.getElementById('blog-cards').innerHTML = '';
+                currentPage = 1;
+                fetchAndDisplayBlogs(currentPage);
+            } catch (error) {
+                console.error('Error creating blog post:', error);
+                alert('Failed to create blog post. Please try again.');
+            }
+        });
+    
+        // Initial load
+        fetchAndDisplayBlogs(currentPage);
+    </script>
+    
 </body>
 </html>
