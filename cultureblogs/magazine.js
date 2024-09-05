@@ -95,3 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchBlogContent(blogId);
     fetchAndDisplayTopBlogs();
 });
+
+
+
+
+const logo = document.getElementById('logo-image');
+logo.style.cursor = 'pointer'; 
+
+logo.addEventListener('click', function() {
+    window.location.href = window.location.origin; 
+});

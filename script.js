@@ -136,3 +136,12 @@ if (seeMoreButton) {
         fetchAndCreateBlogs(currentPage);
     });
 }
+
+
+
+    const logo = document.getElementById('logo-image');
+    logo.style.cursor = 'pointer'; 
+    
+    logo.addEventListener('click', function() {
+        window.location.href = window.location.origin; 
+    });
