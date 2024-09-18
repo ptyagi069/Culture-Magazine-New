@@ -4,173 +4,339 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <title>Admin Dashboard</title>
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f5f7fa;
+            --text-color: #333;
+            --card-background: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .search-bar {
+            margin-bottom: 20px;
             display: flex;
-            gap: 20px;
+            gap: 10px;
         }
+
+        .search-bar input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        #search-button {
+            background-color: var(--primary-color);
+        }
+
+        #search-button:hover {
+            background-color: #2980b9;
+        }
+
+        #reset-button {
+            background-color: #e74c3c;
+        }
+
+        #reset-button:hover {
+            background-color: #c0392b;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
         h1 {
-            color: #333;
-            width: 100%;
+            margin: 0;
+            font-size: 2.5em;
+            text-align: center;
         }
+
+        .dashboard {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
         .blog-section {
-            flex: 1;
-            overflow-y: auto;
-            max-height: calc(100vh - 100px);
+            flex: 2;
         }
+
         .blog-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
         }
+
         .blog-card {
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 15px;
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease;
         }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+        }
+
         .blog-card img {
             width: 100%;
-            height: 150px;
+            height: 200px;
             object-fit: cover;
-            border-radius: 5px;
         }
+
+        .blog-card-content {
+            padding: 20px;
+        }
+
+        .blog-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .blog-card p {
+            margin: 10px 0;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
         .edit-section {
             flex: 1;
             position: sticky;
             top: 20px;
         }
+
         .edit-form {
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 20px;
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 25px;
         }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
+
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
-        .form-group input, .form-group textarea {
+
+        .form-group input,
+        .form-group textarea {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 5px;
+            font-size: 16px;
         }
+
         .form-group input[type="checkbox"] {
             width: auto;
-            margin-right: 5px;
+            margin-right: 10px;
         }
+
         button {
-            background-color: #007bff;
-            color: #fff;
+            background-color: var(--secondary-color);
+            color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 12px 20px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
         }
+
         button:hover {
-            background-color: #0056b3;
+            background-color: #27ae60;
         }
+
         #see-more-button {
             display: block;
-            margin: 20px auto;
+            margin: 30px auto;
+            background-color: var(--primary-color);
+        }
+
+        #see-more-button:hover {
+            background-color: #2980b9;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: var(--card-background);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 60%;
+            max-width: 700px;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            .edit-section {
+                position: static;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Admin Dashboard</h1>
-    <div class="container">
-        <div class="blog-section">
-            <div id="blog-cards" class="blog-cards"></div>
-            <button id="see-more-button">See More</button>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-tachometer-alt"></i> Culture Magazine Handling Page</h1>
         </div>
-        
-        <div class="edit-section">
-            <div id="edit-form" class="edit-form" style="display: none;">
-                <h2>Edit Post</h2>
-                <form id="post-form">
-                    <input type="hidden" id="post-id">
-                    <div class="form-group">
-                        <label for="title">Title:</label>
-                        <input type="text" id="title" name="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Category:</label>
-                        <input type="text" id="category" name="category" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="image">Image URL:</label>
-                        <input type="url" id="image" name="image" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="content">Content:</label>
-                        <div id="editor"></div>
-                    </div>
-                    
-                    <!-- Hidden input to store the HTML content -->
-                    <input type="hidden" id="content" name="content" required>
-                    
-                    <div class="form-group">
-                        <label for="visibility">
-                            <input type="checkbox" id="visibility" name="visibility">
-                            Visible
-                        </label>
-                    </div>
-                    <button type="submit">Save Changes</button>
-                </form>
-            </div>
+    </header>
 
-            <button id="new-post-button">New Post</button>
-            <div id="new-post-modal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <span class="close-button">&times;</span>
-                    <h2>Create New Post</h2>
-                    <form id="new-post-form">
+    <div class="container">
+        <div class="dashboard">
+            <div class="blog-section">
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search blogs by title...">
+                    <button id="search-button"><i class="fas fa-search"></i> Search</button>
+                    <button id="reset-button"><i class="fas fa-undo"></i> Reset</button>
+                </div>
+                <div id="blog-cards" class="blog-cards"></div>
+                <button id="see-more-button"><i class="fas fa-plus"></i> Load More</button>
+            </div>
+            
+            <div class="edit-section">
+                <div id="edit-form" class="edit-form" style="display: none;">
+                    <h2><i class="fas fa-edit"></i> Edit Post</h2>
+                    <form id="post-form">
+                        <input type="hidden" id="post-id">
                         <div class="form-group">
-                            <label for="new-title">Title:</label>
-                            <input type="text" id="new-title" name="title" required>
+                            <label for="title">Title:</label>
+                            <input type="text" id="title" name="title" required>
                         </div>
                         <div class="form-group">
-                            <label for="new-category">Category:</label>
-                            <input type="text" id="new-category" name="category" required>
+                            <label for="category">Category:</label>
+                            <input type="text" id="category" name="category" required>
                         </div>
                         <div class="form-group">
-                            <label for="new-image">Image URL:</label>
-                            <input type="url" id="new-image" name="image" required>
+                            <label for="image">Image URL:</label>
+                            <input type="url" id="image" name="image" required>
                         </div>
                         <div class="form-group">
-                            <label for="new-content">Content:</label>
-                            <div id="new-editor"></div>
+                            <label for="content">Content:</label>
+                            <div id="editor"></div>
                         </div>
-                        <input type="hidden" id="new-content" name="content" required>
+                        
+                        <input type="hidden" id="content" name="content" required>
+                        
                         <div class="form-group">
-                            <label for="new-visibility">
-                                <input type="checkbox" id="new-visibility" name="visibility">
+                            <label for="visibility">
+                                <input type="checkbox" id="visibility" name="visibility">
                                 Visible
                             </label>
                         </div>
-                        <button type="submit">Create Post</button>
+                        <button type="submit"><i class="fas fa-save"></i> Save Changes</button>
                     </form>
                 </div>
+
+                <button id="new-post-button"><i class="fas fa-plus-circle"></i> New Post</button>
             </div>
         </div>
     </div>
+
+    <div id="new-post-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2><i class="fas fa-pen-fancy"></i> Create New Post</h2>
+            <form id="new-post-form">
+                <div class="form-group">
+                    <label for="new-title">Title:</label>
+                    <input type="text" id="new-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-category">Category:</label>
+                    <input type="text" id="new-category" name="category" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-image">Image URL:</label>
+                    <input type="url" id="new-image" name="image" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-content">Content:</label>
+                    <div id="new-editor"></div>
+                </div>
+                <input type="hidden" id="new-content" name="content" required>
+                <div class="form-group">
+                    <label for="new-visibility">
+                        <input type="checkbox" id="new-visibility" name="visibility">
+                        Visible
+                    </label>
+                </div>
+                <button type="submit"><i class="fas fa-plus"></i> Create Post</button>
+            </form>
+        </div>
+    </div>
     
-   
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <script>
         const mainurl = 'http://localhost:3000/api/';
@@ -179,28 +345,21 @@
         const quill = new Quill('#editor', {
             theme: "snow",
             modules: {
-                toolbar: [
-                    [{ header: [1, 2, false] }],
-                    ["bold", "italic", "underline"],
-                    ["link", "image"],
-                    [{ list: "ordered" }, { list: "bullet" }],
-                    ["image"],
-                ],
+                'toolbar': [
+          [{ 'font': [] }, { 'size': [] }],
+          [ 'bold', 'italic', 'underline', 'strike' ],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'script': 'super' }, { 'script': 'sub' }],
+          [{ 'header': '1' }, { 'header': '2' }, 'blockquote', 'code-block' ],
+          [{ 'list': 'ordered' }, { 'list': 'bullet'}, { 'indent': '-1' }, { 'indent': '+1' }],
+          [ 'direction', { 'align': [] }],
+          [ 'link', 'image', 'video', 'formula' ],
+          [ 'clean' ]
+    ],
             },
         });
     
-        const newQuill = new Quill('#new-editor', {
-            theme: "snow",
-            modules: {
-                toolbar: [
-                    [{ header: [1, 2, false] }],
-                    ["bold", "italic", "underline"],
-                    ["link", "image"],
-                    [{ list: "ordered" }, { list: "bullet" }],
-                    ["image"],
-                ],
-            },
-        });
+    
     
         function formatDate(dateString) {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -225,15 +384,17 @@
                     blogCard.className = 'blog-card';
                     blogCard.innerHTML = `
                         <img src="${blog.image}" alt="${blog.title}">
-                        <h3>${blog.title}</h3>
-                        <p>Category: ${blog.category}</p>
-                        <p>Date: ${formatDate(blog.createdat)}</p>
-                        <p>Visibility: ${blog.visibility == 'true' ? 'Visible' : 'Hidden'}</p>
-                        <button onclick="editPost(${blog.id})">Edit</button>
-                        <button onclick="deletePost(${blog.id})">Delete</button>
+                        <div class="blog-card-content">
+                            <h3>${blog.title}</h3>
+                            <p><i class="fas fa-folder"></i> ${blog.category}</p>
+                            <p><i class="far fa-calendar-alt"></i> ${formatDate(blog.createdat)}</p>
+                            <p><i class="far fa-eye${blog.visibility == 'true' ? '' : '-slash'}"></i> ${blog.visibility == 'true' ? 'Visible' : 'Hidden'}</p>
+                            <div class="card-actions">
+                                <button onclick="editPost(${blog.id})"><i class="fas fa-edit"></i> Edit</button>
+                                <button onclick="deletePost(${blog.id})"><i class="fas fa-trash-alt"></i> Delete</button>
+                            </div>
+                        </div>
                     `;
-
-                  
                     blogCardsContainer.appendChild(blogCard);
                 });
     
@@ -246,7 +407,6 @@
         }
     
         async function editPost(id) {
-           
             try {
                 const response = await fetch(`${mainurl}magazinepage/${id}`);
                 
@@ -313,7 +473,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(postData)
                 });
-                    console.log(response);
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -385,8 +545,116 @@
         });
     
         // Initial load
+
+
+
+
+        
+        async function searchBlogs(searchTerm) {
+            try {
+                const response = await fetch(`${mainurl}search-blogs?title=${encodeURIComponent(searchTerm)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const blogs = await response.json();
+                displayBlogs(blogs, true);
+            } catch (error) {
+                console.error('Error searching blogs:', error);
+                alert('Failed to search blogs. Please try again later.');
+            }
+        }
+
+        function displayBlogs(blogs, isSearch = false) {
+            const blogCardsContainer = document.getElementById('blog-cards');
+            blogCardsContainer.innerHTML = '';
+
+            if (blogs.length === 0) {
+                blogCardsContainer.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            blogs.forEach(blog => {
+                const blogCard = document.createElement('div');
+                blogCard.className = 'blog-card';
+                blogCard.innerHTML = `
+                    <img src="${blog.image}" alt="${blog.title}">
+                    <div class="blog-card-content">
+                        <h3>${blog.title}</h3>
+                        <p><i class="fas fa-folder"></i> ${blog.category}</p>
+                        <p><i class="far fa-calendar-alt"></i> ${formatDate(blog.createdat)}</p>
+                        <p><i class="far fa-eye${blog.visibility == 'true' ? '' : '-slash'}"></i> ${blog.visibility == 'true' ? 'Visible' : 'Hidden'}</p>
+                        <div class="card-actions">
+                            <button onclick="editPost(${blog.id})"><i class="fas fa-edit"></i> Edit</button>
+                            <button onclick="deletePost(${blog.id})"><i class="fas fa-trash-alt"></i> Delete</button>
+                        </div>
+                    </div>
+                `;
+                blogCardsContainer.appendChild(blogCard);
+            });
+
+            document.getElementById('see-more-button').style.display = isSearch ? 'none' : 'block';
+            isSearchActive = isSearch;
+        }
+
+        async function fetchAndDisplayBlogs(page = 1) {
+            try {
+                const response = await fetch(`${mainurl}latest-blogs?page=${page}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const blogs = await response.json();
+                
+                if (page === 1) {
+                    displayBlogs(blogs);
+                } else {
+                    // Append blogs for "Load More" functionality
+                    blogs.forEach(blog => {
+                        const blogCard = document.createElement('div');
+                        blogCard.className = 'blog-card';
+                        // ... (create blog card HTML as before)
+                        document.getElementById('blog-cards').appendChild(blogCard);
+                    });
+                }
+
+                const seeMoreButton = document.getElementById('see-more-button');
+                seeMoreButton.style.display = blogs.length < 6 ? 'none' : 'block';
+            } catch (error) {
+                console.error('Error fetching blogs:', error);
+                alert('Failed to load blogs. Please try again later.');
+            }
+        }
+
+        document.getElementById('search-button').addEventListener('click', () => {
+            const searchTerm = document.getElementById('search-input').value.trim();
+            if (searchTerm) {
+                searchBlogs(searchTerm);
+            } else {
+                alert('Please enter a search term.');
+            }
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('search-button').click();
+            }
+        });
+
+        document.getElementById('reset-button').addEventListener('click', () => {
+            document.getElementById('search-input').value = '';
+            currentPage = 1;
+            isSearchActive = false;
+            fetchAndDisplayBlogs(currentPage);
+        });
+
+        document.getElementById('see-more-button').addEventListener('click', () => {
+            if (!isSearchActive) {
+                currentPage++;
+                fetchAndDisplayBlogs(currentPage);
+            }
+        });
+
+
         fetchAndDisplayBlogs(currentPage);
     </script>
-    
 </body>
 </html>
