@@ -1,4 +1,4 @@
-var mainurl = 'http://localhost:3000/api/';
+var mainurl = 'https://blogapi.cultureholidays.com/api/';
 async function fetchAndCreateBlogs(page = 1) {
     try {
         const response = await fetch(`${mainurl}latest-blogs?page=${page}`);

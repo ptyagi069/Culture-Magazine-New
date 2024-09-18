@@ -8,7 +8,7 @@ function getUrlParameter(name) {
 
 // Get the blogId from the URL
 const blogId = getUrlParameter('blogid');
-var mainurl = 'http://localhost:3000/api/';
+var mainurl = 'https://blogapi.cultureholidays.com/api/';
 // Format date function
 function formatDate(dateString) {
     const date = new Date(dateString);
